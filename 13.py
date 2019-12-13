@@ -10,7 +10,13 @@ def parse_opcode(opcode):
 # returns something like [2, 1, 0, 1]
 # first is operand, others either 1, 2 or 0
 
-with open("9.txt", "r") as file:
+def draw():
+    for y in range(24):
+        for x in range(42):
+            print(pixels[(x,y)], end="")
+        print()
+
+with open("13.txt", "r") as file:
     code = file.read().split(",")
     code = list(map(int, code))
 
@@ -18,6 +24,13 @@ with open("9.txt", "r") as file:
 code.extend([0] * 32000) # MEMORY!!!
 i = 0
 rbase = 0
+
+ball_x = 0
+paddle_x = 0
+
+out_index = 0
+pixels = {}
+pix = [0,0," "]
 while True:
     step = 4
     cmd = parse_opcode(code[i])
@@ -49,13 +62,41 @@ while True:
             r = rbase
         code[code[i+3] + r] = a * b
     elif cmd[0] == 3:
+##        draw()
         r = 0
         if cmd[1] == 2:
             r = rbase
-        code[code[i+1] + r] = int(input("INPUT: "))
+##        inp = int(input("INPUT: "))
+        inp = 0
+        if paddle_x < ball_x:
+            inp = 1
+        elif paddle_x > ball_x:
+            inp = -1
+        code[code[i+1] + r] = inp
         step = 2
     elif cmd[0] == 4:
-        print("OUTPUT:", a)
+        if out_index == 2:
+            if pix[:2] == [-1, 0]:
+                print("SCORE:", a)
+            if a == 0:
+                pix[2] = " "
+            elif a == 1:
+                pix[2] = "X"
+            elif a == 2:
+                pix[2] = "#"
+            elif a == 3:
+                pix[2] = "="
+                paddle_x = pix[0]
+            elif a == 4:
+                pix[2] = "o"
+                ball_x = pix[0]
+            pixels[(pix[0], pix[1])] = pix[2]
+            pix = [0,0," "]
+            out_index = 0
+        else:
+            pix[out_index] = a
+            out_index += 1
+##        print("OUTPUT:", a)
         step = 2
     elif cmd[0] == 5:
         step = 3
@@ -91,3 +132,4 @@ while True:
 
     if (cmd[0] != 5 and cmd[0] != 6) or force_move:
         i += step
+
