@@ -11,10 +11,12 @@ def parse_opcode(opcode):
 # first is operand, others either 1, 2 or 0
 
 def draw():
+    screen = "\nSCORE: " + str(score)
     for y in range(24):
+        screen += "\n"
         for x in range(42):
-            print(pixels[(x,y)], end="")
-        print()
+            screen += pixels[(x,y)]
+    print(screen)
 
 with open("13.txt", "r") as file:
     code = file.read().split(",")
@@ -31,6 +33,7 @@ paddle_x = 0
 out_index = 0
 pixels = {}
 pix = [0,0," "]
+score = 0
 while True:
     step = 4
     cmd = parse_opcode(code[i])
@@ -62,7 +65,7 @@ while True:
             r = rbase
         code[code[i+3] + r] = a * b
     elif cmd[0] == 3:
-##        draw()
+        draw()
         r = 0
         if cmd[1] == 2:
             r = rbase
@@ -77,7 +80,8 @@ while True:
     elif cmd[0] == 4:
         if out_index == 2:
             if pix[:2] == [-1, 0]:
-                print("SCORE:", a)
+##                print("SCORE:", a)
+                score = a
             if a == 0:
                 pix[2] = " "
             elif a == 1:
